@@ -11,12 +11,12 @@ jobs:
 
     services:
       mysql:
-        image: mysql:9
+        image: mysql:8.4
         env:
           MYSQL_DATABASE: laravel_modular_kit
           MYSQL_USER: root
-          MYSQL_PASSWORD: 
-          MYSQL_ROOT_PASSWORD: 
+          MYSQL_PASSWORD: root
+          MYSQL_ROOT_PASSWORD: root
         ports:
           - 3306:3306
         options: >-
