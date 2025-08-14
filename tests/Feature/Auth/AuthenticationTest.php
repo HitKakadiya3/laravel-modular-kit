@@ -12,26 +12,30 @@ class AuthenticationTest extends TestCase
 
     public function test_users_can_authenticate_using_the_login_screen(): void
     {
-        $user = User::factory()->create();
-
+        $user = User::factory()->create([
+            'password' => bcrypt('password123'),
+        ]);
         $response = $this->post('/login', [
             'email' => $user->email,
-            'password' => 'password',
+            'password' => 'password123',
         ]);
-
-        $this->assertAuthenticated();
-        $response->assertNoContent();
+        $response->assertRedirect('/home'); // This is default redirect in LoginController
+        $this->assertAuthenticatedAs($user);
     }
 
     public function test_users_can_not_authenticate_with_invalid_password(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+            'password' => bcrypt('password123'),
+        ]);
 
-        $this->post('/login', [
+        $response = $this->from('/login')->post('/login', [
             'email' => $user->email,
             'password' => 'wrong-password',
         ]);
 
+        $response->assertRedirect('/login');
+        $response->assertSessionHasErrors('email');
         $this->assertGuest();
     }
 
@@ -39,9 +43,11 @@ class AuthenticationTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->post('/logout');
+        $this->be($user); // Log in the user
 
+        $response = $this->post('/logout');
+
+        $response->assertRedirect('/'); // Default after logout
         $this->assertGuest();
-        $response->assertNoContent();
     }
 }
