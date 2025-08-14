@@ -15,8 +15,8 @@ jobs:
         env:
           MYSQL_DATABASE: laravel_modular_kit
           MYSQL_USER: root
-          MYSQL_PASSWORD: root
-          MYSQL_ROOT_PASSWORD: root
+          MYSQL_PASSWORD: 
+          MYSQL_ROOT_PASSWORD: 
         ports:
           - 3306:3306
         options: >-
