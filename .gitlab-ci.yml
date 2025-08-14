@@ -1,0 +1,27 @@
+stages:
+  - test
+  - deploy
+
+test:
+  image: php:8.2
+  services:
+    - mysql:8.0
+  variables:
+    MYSQL_ROOT_PASSWORD: root
+    MYSQL_DATABASE: laravel_ci
+    MYSQL_USER: laravel
+    MYSQL_PASSWORD: laravel
+  script:
+    - apt-get update && apt-get install -y git unzip libzip-dev libpng-dev
+    - docker-php-ext-install pdo_mysql zip
+    - curl -sS https://getcomposer.org/installer | php
+    - php composer.phar install --no-interaction --prefer-dist
+    - cp .env.example .env
+    - php artisan key:generate
+    - php artisan migrate --force
+    - php artisan test
+
+deploy:
+  stage: deploy
+  script:
+    - ssh $DEPLOY_USER@$DEPLOY_HOST "cd /var/www/laravel-app && git pull origin main && composer install --no-interaction && php artisan migrate --force"
